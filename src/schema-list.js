@@ -8,6 +8,9 @@ const olDOM = ["ol", 0], ulDOM = ["ul", 0], liDOM = ["li", 0]
 // attribute, `order`, which determines the number at which the list
 // starts counting, and defaults to 1. Represented as an `<ol>`
 // element.
+//
+// @cn 一个有序列表的 [节点配置对象](#model.NodeSpec)。有一个唯一的属性 `order`，它决定了列表从哪个数字开始计数，默认是 1。
+// 表现形式是一个 `<ol>` 元素。
 export const orderedList = {
   attrs: {order: {default: 1}},
   parseDOM: [{tag: "ol", getAttrs(dom) {
@@ -20,6 +23,8 @@ export const orderedList = {
 
 // :: NodeSpec
 // A bullet list node spec, represented in the DOM as `<ul>`.
+//
+// @cn 一个无序列表的节点配置对象，DOM 表示为 `<ul>`。
 export const bulletList = {
   parseDOM: [{tag: "ul"}],
   toDOM() { return ulDOM }
@@ -27,6 +32,10 @@ export const bulletList = {
 
 // :: NodeSpec
 // A list item (`<li>`) spec.
+//
+// @cn 列表项（`<li>`）的配置对象。
+//
+// @comment `li` 父节点可以是 `ol` 也可以是 `ul`，高级用法还可以扩展为 `todo`。
 export const listItem = {
   parseDOM: [{tag: "li"}],
   toDOM() { return liDOM },
@@ -47,12 +56,19 @@ function add(obj, props) {
 // [`bulletList`](#schema-list.bulletList) as `"bullet_list"`, and
 // [`listItem`](#schema-list.listItem) as `"list_item"`.
 //
+// @cn 为 schema 方便的添加列表相关的节点类型到一个特定的节点类型的函数。[`orderedList`](#schema-list.orderedList) 表示为 `"ordered_list"`，
+// [`bulletList`](#schema-list.bulletList) 表示为 `"bullet_list"`， 以及
+// [`listItem`](#schema-list.listItem) 表示为 `"list_item"`。
+//
 // `itemContent` determines the content expression for the list items.
 // If you want the commands defined in this module to apply to your
 // list structure, it should have a shape like `"paragraph block*"` or
 // `"paragraph (ordered_list | bullet_list)*"`. `listGroup` can be
 // given to assign a group name to the list node types, for example
 // `"block"`.
+//
+// @cn `itemContent` 决定了列表项的内容表达式。如果你想要在本模块中定义的命令应用于你自己的列表结构，则它的值应该是诸如 `"paragraph block*"`
+// 或者 `"paragraph (ordered_list | bullet_list)*"` 之类的。`listGroup` 可以将列表节点类型分配到一个组名，比如 `"block"`。
 export function addListNodes(nodes, itemContent, listGroup) {
   return nodes.append({
     ordered_list: add(orderedList, {content: "list_item+", group: listGroup}),
@@ -66,6 +82,9 @@ export function addListNodes(nodes, itemContent, listGroup) {
 // the given type an attributes. If `dispatch` is null, only return a
 // value to indicate whether this is possible, but don't actually
 // perform the change.
+//
+// @cn 返回一个命令函数，该函数用给定的类型和属性包裹位于 list 中的选区。如果 `dispatch` 参数是 null，则只返回一个指示该行为是否可能的值，
+// 而不实际执行修改。
 export function wrapInList(listType, attrs) {
   return function(state, dispatch) {
     let {$from, $to} = state.selection
@@ -114,6 +133,8 @@ function doWrapInList(tr, range, wrappers, joinBefore, listType) {
 // :: (NodeType) → (state: EditorState, dispatch: ?(tr: Transaction)) → bool
 // Build a command that splits a non-empty textblock at the top level
 // of a list item by also splitting that list item.
+//
+// @cn 构建一个命令，它会通过分割列表项的直接子元素的非空文本节点的方式来分割一个列表项。
 export function splitListItem(itemType) {
   return function(state, dispatch) {
     let {$from, $to, node} = state.selection
@@ -152,6 +173,8 @@ export function splitListItem(itemType) {
 // :: (NodeType) → (state: EditorState, dispatch: ?(tr: Transaction)) → bool
 // Create a command to lift the list item around the selection up into
 // a wrapping list.
+//
+// @cn 创建一个命令，该命令会提升选区所在的列表项到上一级列表中。
 export function liftListItem(itemType) {
   return function(state, dispatch) {
     let {$from, $to} = state.selection
@@ -206,6 +229,8 @@ function liftOutOfList(state, dispatch, range) {
 // :: (NodeType) → (state: EditorState, dispatch: ?(tr: Transaction)) → bool
 // Create a command to sink the list item around the selection down
 // into an inner list.
+//
+// @cn 创建一个命令，该命令会将选区所在的列表项缩进到一个内部列表中去。
 export function sinkListItem(itemType) {
   return function(state, dispatch) {
     let {$from, $to} = state.selection
